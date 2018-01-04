@@ -1,5 +1,7 @@
 <?php
 
+use Prophecy\Argument;
+
 /**
  * CalculatorTest
  *
@@ -19,12 +21,19 @@ class CalculatorTest extends AbstractTest {
     private $calculator;
     
     
-    public function testMinus() {
+    public function testDivide() {
+        // constricts multiply() method usage to 0
+        $this->calculator->multiply()->shouldNotBeCalled();
+        // constricts divide() method usage to 1 (should be called EXACTLY 1 time)
+        // remember that arguments are also checked, so if they won't match, checkPredictions() method throws an exception
+        $this->calculator->divide(4,2)->shouldBeCalled(1);
+        // checks only argument types, not values, so if you had changed 'int' to 'string' test will fail, because arguments are 4 and 2 
+        $this->calculator->divide(Argument::type('int'), Argument::type('int'))->shouldBeCalled(1);
         $calc = $this->calculator->reveal();
         $this->assertTrue( $calc->divide(4,2) === 2 );
     }
     
-    public function testMinusFailed() {
+    public function testDivideFailed() {
         $ok = false;
         try {
             $calc = $this->calculator->reveal();
@@ -46,6 +55,6 @@ class CalculatorTest extends AbstractTest {
     }
     
     protected function tearDown(){
-        //$this->prophet->checkPredictions();
+        $this->prophet->checkPredictions();
     }
 }
